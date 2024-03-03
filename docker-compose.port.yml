@@ -1,0 +1,41 @@
+version: '3.8'
+
+networks:
+  default:
+    driver: bridge
+
+services:
+  app:
+    container_name: test_port_app_1
+    build: 
+      context: ./
+      dockerfile: ./docker/Dockerfile
+    ports: 
+      - "85:85"
+    networks: 
+      - default
+    depends_on: 
+      - db    
+    volumes:
+      - "./:/var/www/app"
+      - "./scripts/test-domen.ru.conf:/etc/apache2/sites-available/test-domen.ru.conf"   
+
+  db:
+    image: mysql:8.0
+    container_name: test_port_db_1
+    #restart: always
+    networks: 
+      - default
+    ports:
+      - "3212:3212"
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: port_db
+      MYSQL_PASSWORD: root
+      MYSQL_TCP_PORT: 3212
+    volumes:
+      - db:/var/lib/mysql
+
+volumes:
+  db:
+    driver: local
